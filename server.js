@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express'); 
+const bodyParser = require('body-parser');
 
 const user = require('./routes/api/user');
 const profile = require('./routes/api/profile');
