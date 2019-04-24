@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const gravator = require('gravator');
+const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 
 //load models
@@ -16,7 +16,7 @@ router.post('/register',(req,res) =>{
             return res.status(400).json();
         }
         else{
-            const avatar = gravator.url(req.body.email,{
+            const avatar = gravatar.url(req.body.email,{
                 s: '200', //sie
                 r: 'pg', //rating
                 d: 'mm' //default
@@ -35,10 +35,10 @@ router.post('/register',(req,res) =>{
                     }
                     newUser.password = hash;
                     newUser.save().then((user) =>res.json(user)).catch((err) => console.log(err));
-                })
-            })
+                });
+            });
         }
-    })
+    });
 });
 
 module.exports = router
