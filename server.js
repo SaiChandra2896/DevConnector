@@ -8,7 +8,7 @@ const post = require('./routes/api/post');
 
 const app = express();
 
-//body parser middleware to use req.use
+//body parser middleware to use req.user
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
