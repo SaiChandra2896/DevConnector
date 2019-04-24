@@ -14,6 +14,11 @@ router.post('/register',(req,res) =>{
             return res.status(400).json();
         }
         else{
+            const avatar = gravator.url(req.body.email,{
+                s: '200', //sie
+                r: 'pg', //rating
+                d: 'mm' //default
+            });
             const newUser = new User({
                 name: req.body.name,
                 email: req.body.email,
