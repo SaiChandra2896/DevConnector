@@ -7,6 +7,9 @@ const passport = require('passport');
 
 const keys = require('../../config/keys')
 
+//load input validation
+const validateRegisterInput = require('../../validation/registration');
+
 //load models
 const User = require('../../models/User');
 
@@ -15,13 +18,19 @@ router.get('/test', (req,res) =>{
 });
 
 router.post('/register',(req,res) =>{
+    const { errors, isValid} = validateRegisterInput(req.body);
+
+    if(!isValid){
+        return res.status(400).json(errors);
+    }
+
     User.findOne({email: req.body.email}).then((user) =>{
         if(user){
             return res.status(400).json();
         }
         else{
             const avatar = gravatar.url(req.body.email,{
-                s: '200', //sie
+                s: '200', //size
                 r: 'pg', //rating
                 d: 'mm' //default
             });
@@ -75,7 +84,11 @@ router.post('/login', (req,res) =>{
 
 //return current user (private route)
 router.get('/current',passport.authenticate('jwt',{session: false}),(req,res) =>{
-    res.json({ msg: 'success'});
+    res.json({
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+    });
 });
 
 module.exports = router
