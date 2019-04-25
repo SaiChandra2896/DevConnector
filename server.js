@@ -21,7 +21,11 @@ mongoose.connect(db,{useNewUrlParser: true}).then(() => console.log('mongodb con
 
 const port = process.env.PORT || 5000;
 
+//passport middleware
+app.use(passport.initialize());
 
+//passport config
+require('./config/passport')(passport);
 
 //use routes
 app.use('/api/user',user);
