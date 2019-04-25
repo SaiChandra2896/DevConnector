@@ -111,7 +111,7 @@ const ProfileSchema = new Schema({
         }, 
         instagram:{
             type: String
-        },
+        }
     },
     date:{
         type: Date,
