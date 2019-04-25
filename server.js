@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express'); 
 const bodyParser = require('body-parser');
+const passport = require('passport');
 
 const user = require('./routes/api/user');
 const profile = require('./routes/api/profile');
@@ -20,9 +21,7 @@ mongoose.connect(db,{useNewUrlParser: true}).then(() => console.log('mongodb con
 
 const port = process.env.PORT || 5000;
 
-app.get('/',(req,res) =>{
-    res.send('Hello!!');
-});
+
 
 //use routes
 app.use('/api/user',user);
