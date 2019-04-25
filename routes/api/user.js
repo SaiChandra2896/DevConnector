@@ -9,6 +9,7 @@ const keys = require('../../config/keys')
 
 //load input validation
 const validateRegisterInput = require('../../validation/registration');
+const validateLoginInput = require('../../validation/login');
 
 //load models
 const User = require('../../models/User');
@@ -60,6 +61,12 @@ router.post('/login', (req,res) =>{
 
    //find user by email
    User.findOne({email}).then((user) =>{
+    const { errors, isValid} = validateLoginInput(req.body);
+
+    if(!isValid){
+        return res.status(400).json(errors);
+    }
+
        if(!user){
            return res.status(404).json({email: 'user  not found'})
        }
