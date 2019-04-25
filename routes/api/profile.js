@@ -3,6 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+//validation
+const validateProfileInput = require('../../validation/profile');
+
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 
@@ -27,8 +30,15 @@ router.get('/',passport.authenticate('jwt',{session: false}),(req,res) =>{
 
 //create and update user profile
 router.post('/',passport.authenticate('jwt', { session: false}),(req,res) =>{
+    const { errors ,isValid} = validateProfileInput(req.body);
+    //check validation
+    if(!isValid){
+        return res.status(400).json(errors);
+    }
+
     //get feilds
     const profileFields = {};
+    //getting id from logged in user
     profileFields.user = req.user.id;
     //checking if handle is sent through our form
     if(req.body.handle){
@@ -80,14 +90,16 @@ router.post('/',passport.authenticate('jwt', { session: false}),(req,res) =>{
     Profile.findOne({ user: req.user.id}).then((profile) =>{
         if(profile){
             //update
-            profile.findOneAndUpdate({ user: req.user.id},{ $set: profileFields},{ new:true}).then((profile) =>{
+            Profile.findByIdAndUpdate({ user: req.user.id},{ $set: profileFields},{ new:true}).then((profile) =>{
                 res.json(profile);
+            }).catch((err) =>{
+                res.status(400).json(err)
             });
         }
         else{
             //create
             //check if handle exists
-            Profile.findOne({ handle: profileFields}).then((profile) =>{
+            Profile.findOne({ handle: profileFields.handle}).then((profile) =>{
                 if(profile){
                     errors.handle = 'That handle already exists';
                     res.status(400).json(errors);
@@ -96,6 +108,8 @@ router.post('/',passport.authenticate('jwt', { session: false}),(req,res) =>{
                 new Profile(profileFields).save().then((profile) =>{
                     res.json(profile);
                 })
+            }).catch((err) =>{
+                res.status(400).json(err)
             })
         }
     })
