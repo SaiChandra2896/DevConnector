@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 
 const Post = require("../../models/Post");
+const Profile = require("../../models/Profile");
 
 //validation file
 const validatePostInput = require("../../validation/post");
@@ -62,6 +63,35 @@ router.post(
 
     newPost.save().then(post => {
       res.json(post);
+    });
+  }
+);
+
+//delete post
+router.delete(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.id).then(post => {
+        //check for post owner
+        console.log(post.user);
+        console.log(req.user.id);
+        if (post.user.toString() !== req.user.id) {
+          return res.status(401).json({ notauthorized: "User not authorized" });
+        }
+        if (!post) {
+          return res.status(404).json({ postnotfound: "No Post found" });
+        }
+        post
+          .remove()
+          .then(() => {
+            res.json({ msg: "Post deleted" });
+          })
+          .catch(err => {
+            res.status(404).json(err);
+          });
+      });
     });
   }
 );
