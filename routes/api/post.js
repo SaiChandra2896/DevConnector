@@ -125,4 +125,43 @@ router.post(
   }
 );
 
+//unlike post
+router.post(
+  "/unlike/:postid",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.postid).then(post => {
+        if (!post) {
+          return res.status(404).json({ postnotfound: "No Post found" });
+        }
+        if (
+          post.likes.filter(like => like.user.toString() === req.user.id)
+            .length === 0
+        ) {
+          return res
+            .status(400)
+            .json({ notliked: "You have not liked the post" });
+        }
+        //get remove index
+        const removeIndex = post.likes
+          .map(item => item.user.toString())
+          .indexOf(req.user.id);
+
+        //remove out of array
+        post.likes.splice(removeIndex, 1);
+
+        post
+          .save()
+          .then(post => {
+            res.json(post);
+          })
+          .catch(err => {
+            res.status(404).json(err);
+          });
+      });
+    });
+  }
+);
+
 module.exports = router;
