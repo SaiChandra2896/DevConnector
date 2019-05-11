@@ -12,6 +12,17 @@ router.get("/test", (req, res) => {
   res.json({ msg: "Post works" });
 });
 
+//get posts
+router.get("/", (req, res) => {
+  Post.find()
+    .sort({ date: -1 })
+    .then(posts => {
+      res.json(posts);
+    })
+    .catch(err => {
+      res.status(404).json(err);
+    });
+});
 //create post
 router.post(
   "/",
