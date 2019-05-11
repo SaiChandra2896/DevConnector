@@ -16,6 +16,7 @@ router.get(
   (req, res) => {
     const errors = {};
     Profile.findOne({ user: req.user.id })
+      .populate("user", ["name", "avatar"])
       .then(profile => {
         if (!profile) {
           errors.noprofile = "There is no profile for this user";
@@ -36,6 +37,7 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const { errors, isValid } = validateProfileInput(req.body);
+    //console.log(req.body);
     //check validation
     if (!isValid) {
       return res.status(400).json(errors);
@@ -60,9 +62,6 @@ router.post(
     }
     if (req.body.status) {
       profileFields.status = req.body.status;
-    }
-    if (req.body.skills) {
-      profileFields.skills = req.body.skills;
     }
     if (req.body.bio) {
       profileFields.bio = req.body.bio;
@@ -95,34 +94,26 @@ router.post(
     Profile.findOne({ user: req.user.id }).then(profile => {
       if (profile) {
         //update
-        Profile.findByIdAndUpdate(
+        Profile.findOneAndUpdate(
           { user: req.user.id },
           { $set: profileFields },
           { new: true }
-        )
-          .then(profile => {
-            res.json(profile);
-          })
-          .catch(err => {
-            res.status(400).json(err);
-          });
+        ).then(profile => {
+          res.json(profile);
+        });
       } else {
         //create
         //check if handle exists
-        Profile.findOne({ handle: profileFields.handle })
-          .then(profile => {
-            if (profile) {
-              errors.handle = "That handle already exists";
-              res.status(400).json(errors);
-            }
-            //save profile
-            new Profile(profileFields).save().then(profile => {
-              res.json(profile);
-            });
-          })
-          .catch(err => {
-            res.status(400).json(err);
+        Profile.findOne({ handle: profileFields.handle }).then(profile => {
+          if (profile) {
+            errors.handle = "That handle already exists";
+            res.status(400).json(errors);
+          }
+          //save profile
+          new Profile(profileFields).save().then(profile => {
+            res.json(profile);
           });
+        });
       }
     });
   }
