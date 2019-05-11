@@ -6,6 +6,7 @@ const passport = require("passport");
 //validation
 const validateProfileInput = require("../../validation/profile");
 const validateExperienceInput = require("../../validation/experience");
+const validateEducationInput = require("../../validation/education");
 
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
@@ -194,6 +195,38 @@ router.post(
       };
       //add to profile
       profile.experience.unshift(newExp);
+
+      profile.save().then(profile => {
+        res.json(profile);
+      });
+    });
+  }
+);
+
+//add education
+router.post(
+  "/education",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateEducationInput(req.body);
+    //console.log(req.body);
+    //check validation
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      const newEdu = {
+        college: req.body.college,
+        degree: req.body.degree,
+        fieldofStudy: req.body.fieldofStudy,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      };
+      //add to profile
+      profile.education.unshift(newEdu);
 
       profile.save().then(profile => {
         res.json(profile);
