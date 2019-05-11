@@ -75,8 +75,8 @@ router.delete(
     Profile.findOne({ user: req.user.id }).then(profile => {
       Post.findById(req.params.id).then(post => {
         //check for post owner
-        console.log(post.user);
-        console.log(req.user.id);
+        //console.log(post.user);
+        //console.log(req.user.id);
         if (post.user.toString() !== req.user.id) {
           return res.status(401).json({ notauthorized: "User not authorized" });
         }
@@ -91,6 +91,35 @@ router.delete(
           .catch(err => {
             res.status(404).json(err);
           });
+      });
+    });
+  }
+);
+
+//like post
+router.post(
+  "/like/:postid",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.postid).then(post => {
+        if (!post) {
+          return res.status(404).json({ postnotfound: "No Post found" });
+        }
+        if (
+          post.likes.filter(like => like.user.toString() === req.user.id)
+            .length > 0
+        ) {
+          return res
+            .status(400)
+            .json({ alreadyliked: "User already liked this post" });
+        }
+        //add user id to post array
+        post.likes.unshift({ user: req.user.id });
+
+        post.save().then(post => {
+          res.json(post);
+        });
       });
     });
   }
