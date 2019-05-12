@@ -10,16 +10,22 @@ const Profile = require("../../models/Profile");
 const validatePostInput = require("../../validation/post");
 
 router.get("/test", (req, res) => {
-  res.json({ msg: "Post works" });
+  res.json({
+    msg: "Post works"
+  });
 });
 
 //get posts
 router.get("/", (req, res) => {
   Post.find()
-    .sort({ date: -1 })
+    .sort({
+      date: -1
+    })
     .then(posts => {
       if (!posts) {
-        return res.status(404).json({ noposts: "no posts found" });
+        return res.status(404).json({
+          noposts: "no posts found"
+        });
       }
       res.json(posts);
     })
@@ -35,7 +41,9 @@ router.get("/:id", (req, res) => {
       if (!post) {
         return res
           .status(404)
-          .json({ nopostfound: "No Post found with that id" });
+          .json({
+            nopostfound: "No Post found with that id"
+          });
       }
       res.json(post);
     })
@@ -47,9 +55,14 @@ router.get("/:id", (req, res) => {
 //create post
 router.post(
   "/",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false
+  }),
   (req, res) => {
-    const { errors, isValid } = validatePostInput(req.body);
+    const {
+      errors,
+      isValid
+    } = validatePostInput(req.body);
 
     if (!isValid) {
       return res.status(400).json(errors);
@@ -70,23 +83,33 @@ router.post(
 //delete post
 router.delete(
   "/:id",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false
+  }),
   (req, res) => {
-    Profile.findOne({ user: req.user.id }).then(profile => {
+    Profile.findOne({
+      user: req.user.id
+    }).then(profile => {
       Post.findById(req.params.id).then(post => {
         //check for post owner
         //console.log(post.user);
         //console.log(req.user.id);
         if (post.user.toString() !== req.user.id) {
-          return res.status(401).json({ notauthorized: "User not authorized" });
+          return res.status(401).json({
+            notauthorized: "User not authorized"
+          });
         }
         if (!post) {
-          return res.status(404).json({ postnotfound: "No Post found" });
+          return res.status(404).json({
+            postnotfound: "No Post found"
+          });
         }
         post
           .remove()
           .then(() => {
-            res.json({ msg: "Post deleted" });
+            res.json({
+              msg: "Post deleted"
+            });
           })
           .catch(err => {
             res.status(404).json(err);
@@ -99,23 +122,33 @@ router.delete(
 //like post
 router.post(
   "/like/:postid",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false
+  }),
   (req, res) => {
-    Profile.findOne({ user: req.user.id }).then(profile => {
+    Profile.findOne({
+      user: req.user.id
+    }).then(profile => {
       Post.findById(req.params.postid).then(post => {
         if (!post) {
-          return res.status(404).json({ postnotfound: "No Post found" });
+          return res.status(404).json({
+            postnotfound: "No Post found"
+          });
         }
         if (
           post.likes.filter(like => like.user.toString() === req.user.id)
-            .length > 0
+          .length > 0
         ) {
           return res
             .status(400)
-            .json({ alreadyliked: "User already liked this post" });
+            .json({
+              alreadyliked: "User already liked this post"
+            });
         }
         //add user id to post array
-        post.likes.unshift({ user: req.user.id });
+        post.likes.unshift({
+          user: req.user.id
+        });
 
         post.save().then(post => {
           res.json(post);
@@ -128,20 +161,28 @@ router.post(
 //unlike post
 router.post(
   "/unlike/:postid",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false
+  }),
   (req, res) => {
-    Profile.findOne({ user: req.user.id }).then(profile => {
+    Profile.findOne({
+      user: req.user.id
+    }).then(profile => {
       Post.findById(req.params.postid).then(post => {
         if (!post) {
-          return res.status(404).json({ postnotfound: "No Post found" });
+          return res.status(404).json({
+            postnotfound: "No Post found"
+          });
         }
         if (
           post.likes.filter(like => like.user.toString() === req.user.id)
-            .length === 0
+          .length === 0
         ) {
           return res
             .status(400)
-            .json({ notliked: "You have not liked the post" });
+            .json({
+              notliked: "You have not liked the post"
+            });
         }
         //get remove index
         const removeIndex = post.likes
