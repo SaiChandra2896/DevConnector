@@ -216,7 +216,7 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  
+
   Post.findById(req.params.id).then((post) => {
     const newComment = {
       text: req.body.text,
@@ -231,6 +231,27 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
     post.save().then((post) => {
       res.json(post)
     }).catch((err) => {
+      res.status(404).json({ postnotfound: 'No Post Found' })
+    })
+  });
+});
+
+//delete comment
+//it needs to know which comment to delete so comment id id required
+router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+
+  Post.findById(req.params.id).then((post) => {
+    //check if the comment exists
+    if (post.comments.filter(comment => comment._id.toString() === req.params.comment_id).length === 0) {
+      return res.status(404).json({ commentNotFound: 'Comment not found' });
+    }
+
+    //get remove index
+    const removeIndex = post.comments.map(item => item._id.toString()).indexOf(req.params.comment_id)
+
+    //splice comment to remove
+    post.comments.splice(removeIndex, 1);
+    post.save().then(post => res.json(post)).catch((err) => {
       res.status(404).json({ postnotfound: 'No Post Found' })
     })
   });
