@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios'
+import axios from 'axios';
+import classnames from 'classnames';
 
 class Register extends Component {
   constructor() {
@@ -23,7 +24,12 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     }
-    axios.post('/api/user/register', newUser).then(res => console.log(res.data)).catch(err => console.log(err));
+    axios.post('/api/user/register', newUser).then(res => console.log(res.data))
+      .catch((err) => {
+        console.log('error', err.response.data);
+        this.setState({ errors: err.response.data })
+        console.log('0000', this.state.errors);
+      });
   }
 
 
@@ -32,8 +38,10 @@ class Register extends Component {
   }
 
   render() {
+    //const { errors } = this.state.errors;
+
     return (
-      <div className="register">
+      <div className="needs-validation" novalidate>
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
@@ -41,7 +49,7 @@ class Register extends Component {
               <p className="lead text-center">Create your Developers World account</p>
               <form onSubmit={this.onSubmit}>
                 <div className="form-group">
-                  <input type="text" className="form-control form-control-lg" placeholder="Name" name="name" value={this.state.name} onChange={this.onChange} />
+                  <input type="text" className="form-control form-control-lg" id="validationCustom01" placeholder="Name" name="name" value={this.state.name} onChange={this.onChange} />
                 </div>
                 <div className="form-group">
                   <input type="email" className="form-control form-control-lg" placeholder="Email Address" name="email" value={this.state.email} onChange={this.onChange} />
