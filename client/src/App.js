@@ -14,7 +14,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import './App.css';
 
-//check for token
+//check for token for evry page reload
 if (localStorage.jwtToken) {
   //setauthtoken header auth
   setAuthToken(localStorage.jwtToken);
