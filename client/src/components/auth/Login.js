@@ -18,6 +18,7 @@ class Login extends Component {
 
   //to set redux data to props
   componentWillReceiveProps(nextProps) {
+    //test to check user is logged in
     if (nextProps.auth.isAuthenticated) {
       this.props.history.push('/dashboard')
     }
@@ -33,12 +34,12 @@ class Login extends Component {
   onSubmit(event) {
     event.preventDefault();
 
-    const userdata = {
+    const userData = {
       email: this.state.email,
       password: this.state.password
     }
     //to give login user as props to component
-    this.props.loginUser(userdata);
+    this.props.loginUser(userData);
   }
   render() {
     const { errors } = this.state;
@@ -50,7 +51,7 @@ class Login extends Component {
               <div className="col-md-8 m-auto">
                 <h1 className="display-4 text-center">Log In</h1>
                 <p className="lead text-center">Sign in to your Developers World account</p>
-                <form onSubmit={this.onSubmit}>
+                <form noValidate onSubmit={this.onSubmit}>
                   <div className="form-group">
                     <input type="email" className={classnames("form-control form-control-lg", {
                       "is-invalid": errors.email
@@ -83,6 +84,6 @@ Login.propTypes = {
 const mapStateToProps = (state) => ({
   auth: state.auth,
   errors: state.errors
-})
+});
 
 export default connect(mapStateToProps, { loginUser })(Login);
